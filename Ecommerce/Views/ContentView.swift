@@ -9,17 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var cartManager = CartManager()
+    @StateObject var productViewModel = ProductsViewModel()
     
     var columns: [GridItem] = [GridItem(.adaptive(minimum: 160),spacing: 20)]
-    var products: [Product] = [
-        Product(imageName: "1", name: "Sea Sweater", price: 99),
-        Product(imageName: "2", name: "Sea Sweater", price: 99),
-        Product(imageName: "3", name: "Sea Sweater", price: 99),
-        Product(imageName: "4", name: "Sea Sweater", price: 99),
-        Product(imageName: "5", name: "Sea Sweater", price: 99),
-        Product(imageName: "6", name: "Sea Sweater", price: 99),
-        Product(imageName: "7", name: "Sea Sweater", price: 99),
-    ]
+    @State var products: [Product] = []
     var body: some View {
         NavigationView {
             ScrollView{
@@ -42,7 +35,21 @@ struct ContentView: View {
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .task{
+            await productViewModel.getProducts { result in
+                switch result {
+                case .success(let allProducts):
+                    DispatchQueue.main.async {
+                        self.products = allProducts
+                    }
+                case .failure(let error):
+                    print("Error while fetching data \(error)")
+                }
+            }
+        }
     }
+    
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

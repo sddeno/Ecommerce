@@ -13,36 +13,22 @@ struct ProductRow: View {
     var product: Product
     var body: some View {
         HStack{
-            Image(product.imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 150, height: 100)
-                .cornerRadius(10)
-            VStack(alignment: .leading,spacing: 10){
-                Text("\(product.name)")
-                Text("$\(product.price)")
-                HStack{
-                    Text(" Qnt: \(product.multipleSelectionCount)")
-//                    quantityPlusMinus(product: product)
-                    Stepper("") {
-                        cartManager.addToCart(product: product)
-                    } onDecrement: {
-                        cartManager.removeFromCart(product: product)
-                    }
-                }
-                .border(.white)
-                
-            }
-            Spacer()
-            Button {
-                cartManager.deleteFromCart(product: product)
-            } label: {
-                Image("bin")
+            AsyncImage(url: URL(string: product.imageName), content: { image in
+                image
                     .resizable()
-                    .frame(width: 30, height: 30)
-                    .foregroundColor(.red)
-                    .cornerRadius(10)
-            }
+                    .scaledToFit()
+            }, placeholder: {
+                ProgressView()
+            })
+            .scaledToFit()
+            .frame(width: 150, height: 100)
+            .cornerRadius(10)
+            
+            namePriceQuantity()
+            
+            Spacer()
+            
+            binButton()
             
         }
         .padding()
@@ -53,33 +39,62 @@ struct ProductRow: View {
         .padding()
     }
     
-    func quantityPlusMinus(product: Product) -> some View {
-        HStack{
-            Button {
-                cartManager.removeFromCart(product: product)
-            } label: {
-                Image(systemName: "minus.square.fill")
-                    .resizable()
-                    .frame(width: 25, height: 25)
+    func namePriceQuantity() -> some View {
+        VStack(alignment: .leading,spacing: 10){
+            Text("\(product.name)")
+            Text("$\(product.price)")
+            HStack{
+                Text(" Qnt: \(product.multipleSelectionCount)")
+                //                    quantityPlusMinus(product: product)
+                Stepper("") {
+                    cartManager.addToCart(product: product)
+                } onDecrement: {
+                    cartManager.removeFromCart(product: product)
+                }
             }
-            .foregroundColor(.black)
-            
-            Spacer()
-            
-            Button {
-                cartManager.addToCart(product: product)
-            } label: {
-                Image(systemName: "plus.square.fill")
-                    .resizable()
-                    .frame(width: 25, height: 25)
-            }
-            .foregroundColor(.black)
-           
+            .border(.white)
         }
-        .padding(6)
-        .background(content: {Color.white})
-        .cornerRadius(5)
     }
+    
+    func binButton() -> some View {
+        Button {
+            cartManager.deleteFromCart(product: product)
+        } label: {
+            Image("bin")
+                .resizable()
+                .frame(width: 30, height: 30)
+                .foregroundColor(.red)
+                .cornerRadius(10)
+        }
+    }
+    
+    //    func quantityPlusMinus(product: Product) -> some View {
+    //        HStack{
+    //            Button {
+    //                cartManager.removeFromCart(product: product)
+    //            } label: {
+    //                Image(systemName: "minus.square.fill")
+    //                    .resizable()
+    //                    .frame(width: 25, height: 25)
+    //            }
+    //            .foregroundColor(.black)
+    //
+    //            Spacer()
+    //
+    //            Button {
+    //                cartManager.addToCart(product: product)
+    //            } label: {
+    //                Image(systemName: "plus.square.fill")
+    //                    .resizable()
+    //                    .frame(width: 25, height: 25)
+    //            }
+    //            .foregroundColor(.black)
+    //
+    //        }
+    //        .padding(6)
+    //        .background(content: {Color.white})
+    //        .cornerRadius(5)
+    //    }
 }
 
 struct ProductRow_Previews: PreviewProvider {

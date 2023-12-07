@@ -26,47 +26,59 @@ struct ProductCard: View {
     var body: some View {
         VStack{
             // Image
-            Image("\(imageName)")
-                .resizable()
-                .scaledToFit()
-                .frame(minWidth: imageWidth)
-                .frame(height: 250)
-                .background(.gray)
-                .cornerRadius(10)
-                .overlay(alignment: .topTrailing, content: { // add to cart button
-                    Button {
-                        cartManager.addToCart(product: product)
-                    } label: {
-                        Image("AddToCart")
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .cornerRadius(90)
-                            .padding()
-                    }
-                })
-                .cornerRadius(10)
+            AsyncImage(url: URL(string: product.imageName), content: { image in
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .padding(5)
+            }, placeholder: {
+                ProgressView()
+                
+            })
+            .frame(minWidth: imageWidth)
+            .frame(height: 250)
+            .scaledToFit()
+            .background(.gray)
+            .cornerRadius(10)
+            .overlay(alignment: .topTrailing, content: {
+                addToCartButton()
+            })
+            .cornerRadius(10)
         }
-        .overlay(alignment: .bottom) { //
-            Rectangle()
-                .frame(minWidth: imageWidth, maxHeight: 66)
-                .background(.ultraThinMaterial)
-                .cornerRadius(10)
-                .overlay(alignment: .topLeading) {
-                    VStack(alignment: .leading){
-                        Text("\(name)")
-                            .fontWeight(.medium)
-                            .font(.headline)
-                        Text("$\(price)")
-                            .fontWeight(.light)
-                            .font(.caption)
-                    }
-                    .padding(.all)
-                }
+        .overlay(alignment: .bottom) {
+            namePriceBelt()
         }
     }
     
+    func addToCartButton() -> some View {
+        Button {
+            cartManager.addToCart(product: product)
+        } label: {
+            Image("AddToCart")
+                .resizable()
+                .frame(width: 40, height: 40)
+                .cornerRadius(90)
+                .padding()
+        }
+    }
     
-    
+    func namePriceBelt() -> some View {
+        Rectangle()
+            .frame(minWidth: imageWidth, maxHeight: 66)
+            .background(.ultraThinMaterial)
+            .cornerRadius(10)
+            .overlay(alignment: .topLeading) {
+                VStack(alignment: .leading){
+                    Text("\(name)")
+                        .fontWeight(.medium)
+                        .font(.headline)
+                    Text("$\(price)")
+                        .fontWeight(.light)
+                        .font(.caption)
+                }
+                .padding(.all)
+            }
+    }
 }
 
 struct ProductCard_Previews: PreviewProvider {
