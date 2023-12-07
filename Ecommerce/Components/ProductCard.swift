@@ -26,28 +26,60 @@ struct ProductCard: View {
     var body: some View {
         VStack{
             // Image
-            AsyncImage(url: URL(string: product.imageName), content: { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .padding(5)
-            }, placeholder: {
-                ProgressView()
-                
-            })
-            .frame(minWidth: imageWidth)
-            .frame(height: 250)
-            .scaledToFit()
-            .background(.gray)
-            .cornerRadius(10)
-            .overlay(alignment: .topTrailing, content: {
-                addToCartButton()
-            })
-            .cornerRadius(10)
+            let cacheImage = ImageCache.shared.get(forKey: product.imageName)
+            
+            if let image = cacheImage {
+                VStack {
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .padding(5)
+                        .background(content: {
+                            Color.pink
+                        })
+                        .overlay(alignment: .topTrailing, content: {
+                            addToCartButton()
+                        })
+                        .cornerRadius(10)
+                    
+                    foundInCache()
+               }
+            }else{
+                AsyncImage(url: URL(string: product.imageName), content: { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .padding(5)
+                    
+                    storeInCache(image: image)
+                }, placeholder: {
+                    ProgressView()
+                })
+                .frame(minWidth: imageWidth)
+                .frame(height: 250)
+                .scaledToFit()
+                .background(.gray)
+                .cornerRadius(10)
+                .overlay(alignment: .topTrailing, content: {
+                    addToCartButton()
+                })
+                .cornerRadius(10)
+            }
         }
         .overlay(alignment: .bottom) {
             namePriceBelt()
         }
+    }
+    
+    
+    func foundInCache() -> some View{
+        print("found in cache")
+        return EmptyView()
+    }
+    func storeInCache(image: Image) -> some View {
+        ImageCache.shared.set(image, forKey: product.imageName)
+        print("image added to cache")
+        return EmptyView()
     }
     
     func addToCartButton() -> some View {
